@@ -1,0 +1,30 @@
+const API_KEY = "YOUR_OPENWEATHER_API_KEY";
+
+document.getElementById("searchBtn").addEventListener("click", () => {
+  const city = document.getElementById("cityInput").value.trim();
+  if (city === "") {
+    alert("도시명을 입력하세요!");
+    return;
+  }
+  fetchWeather(city);
+});
+
+async function fetchWeather(city) {
+  const url = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${API_KEY}&units=metric&lang=kr`;
+
+  try {
+    const res = await fetch(url);
+    const data = await res.json();
+
+    if (data.cod === "404") {
+      document.getElementById("result").textContent = "도시를 찾을 수 없습니다!";
+      return;
+    }
+
+    document.getElementById("result").textContent =
+      `${data.name}: ${data.main.temp}°C`;
+
+  } catch (err) {
+    document.getElementById("result").textContent = "오류가 발생했습니다.";
+  }
+}
