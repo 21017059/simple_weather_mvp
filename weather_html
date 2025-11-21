@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>간단한 날씨 앱</title>
+</head>
+<body>
+  <h2>날씨 검색</h2>
+  <input id="cityInput" placeholder="도시명 입력">
+  <button id="searchBtn">검색</button>
+
+  <p id="result"></p>
+
+  <script src="app.js"></script>
+</body>
+</html>
