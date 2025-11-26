@@ -1,16 +1,51 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8">
-  <title>간단한 날씨 앱</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Weather Prototype</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <h2>날씨 검색</h2>
-  <input id="cityInput" placeholder="도시명 입력">
-  <button id="searchBtn">검색</button>
+  <div class="app">
+    <h1 id="title">🌤 나만의 날씨</h1>
 
-  <p id="result"></p>
+    <!-- Header -->
+    <header>
+        
+      
+      <div class="search-box">
+        <input type="text" id="cityInput" placeholder="도시 이름 입력" />
+        <button id="searchBtn">검색</button>
+      </div>
+    </header>
 
-  <script src="app.js"></script>
+    <!-- Main Weather Display -->
+    <section class="weather">
+      <div class="weather-main">
+        <img id="weatherIcon" src="" alt="weather icon" />
+        <img id="weather-image" src="" alt="weather image" style="width: 300px">
+        <p id="weather"></p>
+        <h2 id="temp">--°C</h2>
+        <p id="desc">날씨 상태</p>
+      </div>
+
+      <div class="weather-detail">
+        <div>습도: <span id="humidity">--</span>%</div>
+        <div>풍속: <span id="wind">--</span> m/s</div>
+      </div>
+    </section>
+
+    <!-- Forecast Cards -->
+    <section class="forecast">
+      <h3>3일 예보</h3>
+      <div id="forecastContainer" class="forecast-container"></div>
+    </section>
+
+  </div>
+  
+  <script src="script.js"></script>
 </body>
 </html>
+
+
