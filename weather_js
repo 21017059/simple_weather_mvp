@@ -6,17 +6,9 @@ window.addEventListener("DOMContentLoaded", () => {
   }
 });
 
-// ---------------------------
-// ❌ 기존 OpenWeather API Key 제거
-// ---------------------------
-// const API_KEY = "c930f6cdaa430f04e573bc843634c9b8";
-
-// ✔ Netlify에 보관된 키 사용
-//    호출 URL: /.netlify/functions/weather?city=Seoul
-
-// 🟢 Unsplash Key는 공개여도 OK
+// API KEY
+const API_KEY = "c930f6cdaa430f04e573bc843634c9b8";
 const UNSPLASH_ACCESS_KEY = "ePwYJpCLjr2DthQcaTKekXetE38KPbOGEEoVVrdX9Hs";
-
 
 // --- Unsplash 도시 이미지 불러오기 ---
 async function fetchCityImage(city) {
@@ -25,7 +17,7 @@ async function fetchCityImage(city) {
   try {
     const res = await fetch(url);
     const data = await res.json();
-
+    
     if (data.results.length === 0) {
       console.log("도시에 대한 이미지가 없습니다.");
       return;
@@ -43,12 +35,10 @@ async function fetchCityImage(city) {
   }
 }
 
-
-// ---------------------------
-// ⭐ 현재 날씨 (Netlify Function 버전)
-// ---------------------------
+// --- 현재 날씨 ---
 async function fetchWeather(city) {
-  const url = `/.netlify/functions/weather?city=${city}`;
+  const url =
+    `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${API_KEY}&units=metric&lang=kr`;
 
   try {
     const res = await fetch(url);
@@ -64,7 +54,7 @@ async function fetchWeather(city) {
     const temp = data.main.temp;
     updateWeatherimage(temp);
 
-    // 도시 이미지 불러오기
+    // 추가 → 도시 이미지 불러오기
     fetchCityImage(city);
 
   } catch (error) {
@@ -73,12 +63,10 @@ async function fetchWeather(city) {
   }
 }
 
-
-// ---------------------------
-// ⭐ 3일 예보 — 이것도 Netlify Function으로 호출
-// ---------------------------
+// --- 3일 예보 ---
 async function fetchForecast(city) {
-  const url = `/.netlify/functions/weather?city=${city}&forecast=1`;
+  const url =
+    `https://api.openweathermap.org/data/2.5/forecast?q=${city}&appid=${API_KEY}&units=metric&lang=kr`;
 
   try {
     const res = await fetch(url);
@@ -86,11 +74,12 @@ async function fetchForecast(city) {
 
     if (data.cod == "404") return;
 
-    // 3일치 날씨 추리기
     const selected = data.list.filter((item, index) => index % 8 === 0).slice(0, 3);
 
     const simplified = selected.map(item => ({
-      day: new Date(item.dt * 1000).toLocaleDateString("ko-KR", { weekday: "short" }),
+      day: new Date(item.dt * 1000).toLocaleDateString("ko-KR", {
+        weekday: "short",
+      }),
       temp: item.main.temp,
       icon: item.weather[0].icon,
     }));
@@ -103,7 +92,6 @@ async function fetchForecast(city) {
   }
 }
 
-
 // --- 현재 날씨 화면 업데이트 ---
 function displayWeather(data) {
   document.getElementById("temp").textContent = data.main.temp + "°C";
@@ -114,7 +102,6 @@ function displayWeather(data) {
   document.getElementById("weatherIcon").src =
     `https://openweathermap.org/img/wn/${data.weather[0].icon}@2x.png`;
 }
-
 
 // --- 온도별 캐릭터 이미지 ---
 function updateWeatherimage(temp) {
@@ -136,7 +123,6 @@ function updateWeatherimage(temp) {
   }
 }
 
-
 // --- 3일 예보 카드 ---
 function displayForecast(list) {
   const container = document.getElementById("forecastContainer");
@@ -155,7 +141,6 @@ function displayForecast(list) {
     container.appendChild(card);
   });
 }
-
 
 // --- 검색 버튼 ---
 document.getElementById("searchBtn").addEventListener("click", () => {
