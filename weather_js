@@ -19,7 +19,9 @@ window.addEventListener("DOMContentLoaded", () => {
 
   // 도시 검색 처리
   const searchBtn = document.getElementById("searchBtn");
-  searchBtn.addEventListener("click", () => {
+
+  // 검색 처리 함수
+  function handleSearch() {
     const city = document.getElementById("cityInput").value.trim();
     if (!city) {
       alert("도시명을 입력해주세요!");
@@ -27,7 +29,12 @@ window.addEventListener("DOMContentLoaded", () => {
     }
     fetchWeather(city);
     fetchForecast(city);
-  });
+  }
+
+  // PC click + 모바일 touchend 이벤트 모두 등록
+  searchBtn.addEventListener("click", handleSearch);
+  searchBtn.addEventListener("touchend", handleSearch);
+
 });
 
 // --- Unsplash 도시 이미지 불러오기 ---
