@@ -1,14 +1,34 @@
-window.addEventListener("DOMContentLoaded", () => {
-  let userName = prompt("이름을 입력하세요.");
-
-  if (userName) {
-    document.getElementById("title").textContent = `🌤 ${userName}님 만의 날씨`;
-  }
-});
-
 // API KEY
 const API_KEY = "c930f6cdaa430f04e573bc843634c9b8";
 const UNSPLASH_ACCESS_KEY = "ePwYJpCLjr2DthQcaTKekXetE38KPbOGEEoVVrdX9Hs";
+
+window.addEventListener("DOMContentLoaded", () => {
+
+  // 이름 입력 처리
+  const nameInput = document.getElementById("userNameInput");
+  const setNameBtn = document.getElementById("setNameBtn");
+  const nameContainer = document.getElementById("nameContainer");
+
+  setNameBtn.addEventListener("click", () => {
+    const userName = nameInput.value.trim();
+    if (userName) {
+      document.getElementById("title").textContent = `🌤 ${userName}님 만의 날씨`;
+      nameContainer.style.display = "none"; // 입력 후 숨김
+    }
+  });
+
+  // 도시 검색 처리
+  const searchBtn = document.getElementById("searchBtn");
+  searchBtn.addEventListener("click", () => {
+    const city = document.getElementById("cityInput").value.trim();
+    if (!city) {
+      alert("도시명을 입력해주세요!");
+      return;
+    }
+    fetchWeather(city);
+    fetchForecast(city);
+  });
+});
 
 // --- Unsplash 도시 이미지 불러오기 ---
 async function fetchCityImage(city) {
@@ -17,14 +37,13 @@ async function fetchCityImage(city) {
   try {
     const res = await fetch(url);
     const data = await res.json();
-    
-    if (data.results.length === 0) {
+
+    if (!data.results || data.results.length === 0) {
       console.log("도시에 대한 이미지가 없습니다.");
       return;
     }
 
     const imageUrl = data.results[0].urls.regular;
-
     document.body.style.backgroundImage = `url(${imageUrl})`;
     document.body.style.backgroundSize = "cover";
     document.body.style.backgroundPosition = "center";
@@ -37,8 +56,7 @@ async function fetchCityImage(city) {
 
 // --- 현재 날씨 ---
 async function fetchWeather(city) {
-  const url =
-    `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${API_KEY}&units=metric&lang=kr`;
+  const url = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${API_KEY}&units=metric&lang=kr`;
 
   try {
     const res = await fetch(url);
@@ -50,11 +68,7 @@ async function fetchWeather(city) {
     }
 
     displayWeather(data);
-
-    const temp = data.main.temp;
-    updateWeatherimage(temp);
-
-    // 추가 → 도시 이미지 불러오기
+    updateWeatherimage(data.main.temp);
     fetchCityImage(city);
 
   } catch (error) {
@@ -65,8 +79,7 @@ async function fetchWeather(city) {
 
 // --- 3일 예보 ---
 async function fetchForecast(city) {
-  const url =
-    `https://api.openweathermap.org/data/2.5/forecast?q=${city}&appid=${API_KEY}&units=metric&lang=kr`;
+  const url = `https://api.openweathermap.org/data/2.5/forecast?q=${city}&appid=${API_KEY}&units=metric&lang=kr`;
 
   try {
     const res = await fetch(url);
@@ -75,11 +88,8 @@ async function fetchForecast(city) {
     if (data.cod == "404") return;
 
     const selected = data.list.filter((item, index) => index % 8 === 0).slice(0, 3);
-
     const simplified = selected.map(item => ({
-      day: new Date(item.dt * 1000).toLocaleDateString("ko-KR", {
-        weekday: "short",
-      }),
+      day: new Date(item.dt * 1000).toLocaleDateString("ko-KR", { weekday: "short" }),
       temp: item.main.temp,
       icon: item.weather[0].icon,
     }));
@@ -98,7 +108,6 @@ function displayWeather(data) {
   document.getElementById("desc").textContent = data.weather[0].description;
   document.getElementById("humidity").textContent = data.main.humidity;
   document.getElementById("wind").textContent = data.wind.speed;
-
   document.getElementById("weatherIcon").src =
     `https://openweathermap.org/img/wn/${data.weather[0].icon}@2x.png`;
 }
@@ -131,26 +140,11 @@ function displayForecast(list) {
   list.forEach(item => {
     const card = document.createElement("div");
     card.className = "card";
-
     card.innerHTML = `
       <p>${item.day}</p>
       <img src="https://openweathermap.org/img/wn/${item.icon}.png">
       <p>${item.temp}°C</p>
     `;
-
     container.appendChild(card);
   });
 }
-
-// --- 검색 버튼 ---
-document.getElementById("searchBtn").addEventListener("click", () => {
-  const city = document.getElementById("cityInput").value.trim();
-
-  if (city === "") {
-    alert("도시명을 입력해주세요!");
-    return;
-  }
-
-  fetchWeather(city);
-  fetchForecast(city);
-});
